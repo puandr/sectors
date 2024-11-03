@@ -2,9 +2,11 @@ package com.example.sectors_app.service;
 
 import com.example.sectors_app.model.Sector;
 import com.example.sectors_app.repository.SectorRepository;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public class SectorService {
     private final SectorRepository sectorRepository;
 
