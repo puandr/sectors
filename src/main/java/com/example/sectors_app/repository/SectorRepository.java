@@ -16,4 +16,6 @@ public interface SectorRepository extends JpaRepository<Sector, Long> {
     List<String> findAllValueTags();
 
     Optional<Sector> findByValueTag(String valueTag);
+
+    Sector findByName(String name);
 }

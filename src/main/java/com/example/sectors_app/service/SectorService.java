@@ -2,9 +2,11 @@ package com.example.sectors_app.service;
 
 import com.example.sectors_app.model.Sector;
 import com.example.sectors_app.repository.SectorRepository;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class SectorService {
@@ -22,8 +24,12 @@ public class SectorService {
         return sectorRepository.save(sector);
     }
 
-    public Sector getSectorById(Long id) {
-        return sectorRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Sector not fuond"));
+    public Optional<Sector> getSectorById(Long id) {
+
+        Sector sector = sectorRepository.findById(id).orElse(null);
+        if (sector != null) {
+            Hibernate.initialize(sector.getChildren()); // Force initialization
+        }
+        return Optional.ofNullable(sector);
     }
 }
