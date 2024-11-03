@@ -25,7 +25,7 @@ public class Sector {
     @JoinColumn(name = "parent_id")
     private Sector parent;
 
-    @OneToMany(mappedBy = "parent")
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
     private List<Sector> children;
 
     @CreationTimestamp
