@@ -9,11 +9,15 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.Arrays;
+import java.util.UUID;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+@Transactional
 @SpringBootTest
 @AutoConfigureMockMvc
 public class SectorControllerIntegrationTest {
@@ -29,16 +33,29 @@ public class SectorControllerIntegrationTest {
         sectorRepository.deleteAll();
 
         Sector sector1 = new Sector();
-        sector1.setValueTag("1");
+        sector1.setValueTag(UUID.randomUUID().toString());
         sector1.setName("Manufacturing");
 
         Sector sector2 = new Sector();
-        sector2.setValueTag("19");
+        sector2.setValueTag(UUID.randomUUID().toString());
         sector2.setName("Construction materials");
         sector2.setParent(sector1);
 
         sectorRepository.saveAll(Arrays.asList(sector1, sector2));
     }
+
+//    @Test
+//    public void shouldReturnAllSectors() throws Exception {
+//        mockMvc.perform(get("/api/sectors"))
+//                .andExpect(status().isOk())
+//                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+//                .andExpect(jsonPath("$.length()").value(2))
+//                .andExpect(jsonPath("$[0].name").value("Manufacturing"))
+//                .andExpect(jsonPath("$[0].children[0].name").value("Construction materials"))
+//                .andExpect(jsonPath("$[0].children.length()").value(1))
+//                .andExpect(jsonPath("$[1].name").value("Construction materials"))
+//                .andExpect(jsonPath("$[1].children.length()").value(0));
+//    }
 
     @Test
     public void shouldReturnAllSectors() throws Exception {
@@ -47,10 +64,11 @@ public class SectorControllerIntegrationTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.length()").value(2))
                 .andExpect(jsonPath("$[0].name").value("Manufacturing"))
+                .andExpect(jsonPath("$[0].children").isNotEmpty())
                 .andExpect(jsonPath("$[0].children[0].name").value("Construction materials"))
                 .andExpect(jsonPath("$[0].children.length()").value(1))
                 .andExpect(jsonPath("$[1].name").value("Construction materials"))
-                .andExpect(jsonPath("$[1].children.length()").value(0));
+                .andExpect(jsonPath("$[1].children").isEmpty());
     }
 
     @Test

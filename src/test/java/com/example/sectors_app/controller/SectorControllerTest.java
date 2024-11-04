@@ -20,7 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
 
 
-@WebMvcTest
+@WebMvcTest(SectorController.class)
 public class SectorControllerTest {
 
     @Autowired

@@ -7,11 +7,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.mockito.Mockito.*;
 
 //TODO check, if more test are needed
-
+@Transactional
 public class SectorDataLoaderTest {
     @Mock
     private SectorImportService sectorImportService;

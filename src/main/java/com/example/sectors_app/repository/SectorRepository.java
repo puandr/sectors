@@ -18,4 +18,8 @@ public interface SectorRepository extends JpaRepository<Sector, Long> {
     Optional<Sector> findByValueTag(String valueTag);
 
     Sector findByName(String name);
+
+    //
+    @Query("SELECT s FROM Sector s LEFT JOIN FETCH s.children")
+    List<Sector> findAllWithChildren();
 }

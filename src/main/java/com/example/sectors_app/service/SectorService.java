@@ -17,7 +17,8 @@ public class SectorService {
     }
 
     public List<Sector> getAllSectors() {
-        return sectorRepository.findAll();
+//        return sectorRepository.findAll();
+        return sectorRepository.findAllWithChildren();
     }
 
     public Sector saveSector(Sector sector) {
