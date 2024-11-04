@@ -56,10 +56,25 @@ const SectorsForm = () => {
     };
 
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log('Form submitted:', { name, selectedSectors, termsAgreed });
-  };
+//   const handleSubmit = (e) => {
+//     e.preventDefault();
+//     console.log('Form submitted:', { name, selectedSectors, termsAgreed });
+//   };
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        const userInputDto = {
+        name: name,
+        selectedSectors: selectedSectors.map(Number), // Convert sector IDs to numbers
+        agreeToTerms: termsAgreed,
+        };
+
+        try {
+        const response = await axios.post('http://localhost:8080/api/user-inputs', userInputDto);
+        console.log('Form successfully submitted:', response.data);
+        } catch (error) {
+        console.error('Error submitting form:', error);
+        }
+    };
 
   return (
     <form onSubmit={handleSubmit}>
