@@ -32,6 +32,7 @@ public class UserInputControllerIntegrationTest {
         userInputRepository.deleteAll();
     }
 
+    //TODO test for name validaiton
     //TODO refactor tests
 
     @Test
