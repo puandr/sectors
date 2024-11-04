@@ -1,6 +1,8 @@
 package com.example.sectors_app.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
@@ -17,14 +19,17 @@ public class UserInput {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotEmpty(message = "Name is mandatory")
     @Column(nullable = false)
     private String name;
 
+    @NotEmpty(message = "At least one sector should be selected")
     @ElementCollection
     @CollectionTable(name = "user_selected_sectors", joinColumns = @JoinColumn(name = "user_input_id"))
     @Column(name = "sector_id", nullable = false)
     private List<Long> selectedSectors;
 
+    @NotNull(message = "Agreement to terms is mandatory")
     @Column(nullable = false)
     private boolean agreeToTerms;
 
