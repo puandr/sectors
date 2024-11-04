@@ -1,5 +1,6 @@
 package com.example.sectors_app.controller;
 
+import com.example.sectors_app.exception.CustomException;
 import com.example.sectors_app.model.UserInput;
 import com.example.sectors_app.service.UserInputService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,10 +35,17 @@ public class UserInputController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     public ResponseEntity<UserInput> saveUserInput(@RequestBody UserInput userInput) {
-        logger.info("UserInputController - createUserInput - Request for creating user input recieved");
+        logger.info("UserInputController: createUserInput - Request for creating user input received");
 
-        UserInput createdUserInput = userInputService.saveUserInput(userInput);
-        return new ResponseEntity<>(createdUserInput, HttpStatus.CREATED);
+        //TODO refactor exceptions to be more verbose about exact error
+        try {
+            UserInput createdUserInput = userInputService.saveUserInput(userInput);
+            return new ResponseEntity<>(createdUserInput, HttpStatus.CREATED);
+        } catch (DataIntegrityViolationException ex) {
+            throw new CustomException("Invalid user input data provided", HttpStatus.BAD_REQUEST);
+        } catch (Exception ex) {
+            throw new CustomException("An unexpected error occurred", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping
@@ -47,7 +55,8 @@ public class UserInputController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     public ResponseEntity<List<UserInput>> getAllUserInputs() {
-        logger.info("UserInputController - getAllUserInputs - request for retrieving all user inputs recieved");
+        logger.info("UserInputController: getAllUserInputs - request for retrieving all user inputs recieved");
+
         List<UserInput> userInputs = userInputService.getAllUserInputs();
         return ResponseEntity.ok(userInputs);
     }
@@ -60,13 +69,13 @@ public class UserInputController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     public ResponseEntity<UserInput> getUserInputById(@PathVariable Long id) {
-        logger.info("UserInputController - getUserInputById - Request for retrieving user inputs by id recieved");
+        logger.info("UserInputController: getUserInputById - Request for retrieving user inputs by id recieved");
 
         UserInput userInput = userInputService.getUserInputById(id).orElse(null);
         if (userInput != null) {
             return ResponseEntity.ok(userInput);
         } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            throw new CustomException("User input not found", HttpStatus.NOT_FOUND);
         }
     }
 }
