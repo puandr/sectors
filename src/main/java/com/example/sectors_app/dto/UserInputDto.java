@@ -1,5 +1,6 @@
 package com.example.sectors_app.dto;
 
+import com.example.sectors_app.model.UserInput;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -24,4 +25,20 @@ public class UserInputDto {
 
     @NotNull(message = "Agreement to terms is mandatory")
     private boolean agreeToTerms;
+
+    public UserInput toEntity() {
+        UserInput userInput = new UserInput();
+        userInput.setName(this.name);
+        userInput.setSelectedSectors(this.selectedSectors);
+        userInput.setAgreeToTerms(this.agreeToTerms);
+        return userInput;
+    }
+
+    public static UserInputDto fromEntity(UserInput userInput) {
+        UserInputDto dto = new UserInputDto();
+        dto.setName(userInput.getName());
+        dto.setSelectedSectors(userInput.getSelectedSectors());
+        dto.setAgreeToTerms(userInput.isAgreeToTerms());
+        return dto;
+    }
 }

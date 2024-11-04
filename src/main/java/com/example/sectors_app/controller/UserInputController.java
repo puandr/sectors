@@ -1,5 +1,6 @@
 package com.example.sectors_app.controller;
 
+import com.example.sectors_app.dto.UserInputDto;
 import com.example.sectors_app.exception.CustomException;
 import com.example.sectors_app.model.UserInput;
 import com.example.sectors_app.service.UserInputService;
@@ -16,12 +17,12 @@ import org.springframework.web.bind.annotation.*;
 import org.owasp.encoder.Encode;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/user-inputs")
 public class UserInputController {
     private static final Logger logger = LoggerFactory.getLogger(UserInputController.class);
-
 
     private final UserInputService userInputService;
 
@@ -36,15 +37,19 @@ public class UserInputController {
             @ApiResponse(responseCode = "400", description = "Invalid user input data provided"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public ResponseEntity<UserInput> saveUserInput(@Valid @RequestBody UserInput userInput) {
+    public ResponseEntity<UserInputDto> saveUserInput(@Valid @RequestBody UserInputDto userInputDto) {
         logger.info("UserInputController: createUserInput - Request for creating user input received");
 
-        userInput.setName(Encode.forHtml(userInput.getName()));
+        userInputDto.setName(Encode.forHtml(userInputDto.getName()));
 
         //TODO refactor exceptions to be more verbose about exact error
         try {
+//            UserInput createdUserInput = userInputService.saveUserInput(userInputDto);
+//            return new ResponseEntity<>(createdUserInput, HttpStatus.CREATED);
+            UserInput userInput = userInputDto.toEntity(); // Convert DTO to Entity
             UserInput createdUserInput = userInputService.saveUserInput(userInput);
-            return new ResponseEntity<>(createdUserInput, HttpStatus.CREATED);
+            UserInputDto responseDTO = UserInputDto.fromEntity(createdUserInput); // Convert Entity to DTO for response
+            return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
         } catch (DataIntegrityViolationException ex) {
             throw new CustomException("Invalid user input data provided", HttpStatus.BAD_REQUEST);
         } catch (Exception ex) {
@@ -58,11 +63,13 @@ public class UserInputController {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved list of user inputs"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public ResponseEntity<List<UserInput>> getAllUserInputs() {
+    public ResponseEntity<List<UserInputDto>> getAllUserInputs() {
         logger.info("UserInputController: getAllUserInputs - request for retrieving all user inputs recieved");
-
         List<UserInput> userInputs = userInputService.getAllUserInputs();
-        return ResponseEntity.ok(userInputs);
+        List<UserInputDto> userInputDTOs = userInputs.stream().map(UserInputDto::fromEntity).collect(Collectors.toList()); // Convert Entity list to DTO list
+        return ResponseEntity.ok(userInputDTOs);
+//        List<UserInput> userInputs = userInputService.getAllUserInputs();
+//        return ResponseEntity.ok(userInputs);
     }
 
     @GetMapping("/{id}")
@@ -72,12 +79,13 @@ public class UserInputController {
             @ApiResponse(responseCode = "404", description = "User input not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public ResponseEntity<UserInput> getUserInputById(@PathVariable Long id) {
+    public ResponseEntity<UserInputDto> getUserInputById(@PathVariable Long id) {
         logger.info("UserInputController: getUserInputById - Request for retrieving user inputs by id recieved");
 
         UserInput userInput = userInputService.getUserInputById(id).orElse(null);
         if (userInput != null) {
-            return ResponseEntity.ok(userInput);
+            UserInputDto userInputDto = UserInputDto.fromEntity(userInput); // Convert Entity to DTO for response
+            return ResponseEntity.ok(userInputDto);
         } else {
             throw new CustomException("User input not found", HttpStatus.NOT_FOUND);
         }
