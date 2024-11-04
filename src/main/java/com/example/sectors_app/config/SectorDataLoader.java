@@ -22,7 +22,7 @@ public class SectorDataLoader implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) {
-        logger.info("SectorDataLoader - executing importSectors");
+        logger.info("SectorDataLoader: executing importSectors");
         sectorImportService.importSectors(filePath);
     }
 
