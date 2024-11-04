@@ -16,6 +16,8 @@ import java.util.List;
 @AllArgsConstructor
 public class UserInputDto {
 
+    private Long id;
+
     @NotBlank(message = "Name is mandatory")
     @Size(max = 100, message = "Name cannot exceed 100 characters")
     private String name;
@@ -28,6 +30,7 @@ public class UserInputDto {
 
     public UserInput toEntity() {
         UserInput userInput = new UserInput();
+        userInput.setId(this.id);
         userInput.setName(this.name);
         userInput.setSelectedSectors(this.selectedSectors);
         userInput.setAgreeToTerms(this.agreeToTerms);
@@ -36,6 +39,7 @@ public class UserInputDto {
 
     public static UserInputDto fromEntity(UserInput userInput) {
         UserInputDto dto = new UserInputDto();
+        dto.setId(userInput.getId());
         dto.setName(userInput.getName());
         dto.setSelectedSectors(userInput.getSelectedSectors());
         dto.setAgreeToTerms(userInput.isAgreeToTerms());
