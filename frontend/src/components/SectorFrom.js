@@ -6,6 +6,7 @@ const SectorsForm = () => {
   const [sectors, setSectors] = useState([]);
   const [selectedSectors, setSelectedSectors] = useState([]);
   const [termsAgreed, setTermsAgreed] = useState(false);
+  const [formErrors, setFormErrors] = useState({});
 
   useEffect(() => {
     const fetchSectors = async () => {
@@ -38,10 +39,20 @@ const SectorsForm = () => {
     fetchSectors();
   }, []);
 
+    const fetchUserData = async (id) => {
+        try {
+        const response = await axios.get(`http://localhost:8080/api/user-inputs/${id}`);
+        const userData = response.data;
+        setName(userData.name);
+        setSelectedSectors(userData.selectedSectors.map(String));
+        setTermsAgreed(userData.agreeToTerms);
+        } catch (error) {
+        console.error('Error fetching user data:', error);
+        }
+    };
 
     const renderSectorOptions = (sectors, level = 0) => {
     return sectors.map((sector) => {
-        // console.log(`Rendering sector: ${sector.name}, Level: ${level}`);
         return (
         <React.Fragment key={sector.id}>
             <option value={sector.id}>
@@ -55,22 +66,37 @@ const SectorsForm = () => {
     });
     };
 
+    const validateForm = () => {
+        const errors = {};
+        if (!name.trim()) {
+        errors.name = 'Name is required';
+        }
+        if (selectedSectors.length === 0) {
+        errors.selectedSectors = 'At least one sector must be selected';
+        }
+        if (!termsAgreed) {
+        errors.termsAgreed = 'You must agree to the terms';
+        }
+        setFormErrors(errors);
+        return Object.keys(errors).length === 0;
+    };
 
-//   const handleSubmit = (e) => {
-//     e.preventDefault();
-//     console.log('Form submitted:', { name, selectedSectors, termsAgreed });
-//   };
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (!validateForm()) { 
+            return;
+          }
+
         const userInputDto = {
         name: name,
-        selectedSectors: selectedSectors.map(Number), // Convert sector IDs to numbers
-        agreeToTerms: termsAgreed,
+        selectedSectors: selectedSectors.map(Number), 
         };
 
         try {
         const response = await axios.post('http://localhost:8080/api/user-inputs', userInputDto);
         console.log('Form successfully submitted:', response.data);
+
+        fetchUserData(response.data.id); 
         } catch (error) {
         console.error('Error submitting form:', error);
         }
@@ -88,6 +114,7 @@ const SectorsForm = () => {
         value={name}
         onChange={(e) => setName(e.target.value)}
       />
+       {formErrors.name && <div className="error">{formErrors.name}</div>}
 
       <br /><br />
 
@@ -104,6 +131,7 @@ const SectorsForm = () => {
       >
         {renderSectorOptions(sectors)}
       </select>
+      {formErrors.selectedSectors && <div className="error">{formErrors.selectedSectors}</div>}
 
       <br /><br />
 
@@ -115,6 +143,7 @@ const SectorsForm = () => {
         onChange={(e) => setTermsAgreed(e.target.checked)}
       />
       <label htmlFor="terms">Agree to terms</label>
+      {formErrors.termsAgreed && <div className="error">{formErrors.termsAgreed}</div>}
 
       <br /><br />
 
