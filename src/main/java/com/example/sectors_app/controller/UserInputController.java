@@ -44,11 +44,9 @@ public class UserInputController {
 
         //TODO refactor exceptions to be more verbose about exact error
         try {
-//            UserInput createdUserInput = userInputService.saveUserInput(userInputDto);
-//            return new ResponseEntity<>(createdUserInput, HttpStatus.CREATED);
-            UserInput userInput = userInputDto.toEntity(); // Convert DTO to Entity
+            UserInput userInput = userInputDto.toEntity();
             UserInput createdUserInput = userInputService.saveUserInput(userInput);
-            UserInputDto responseDTO = UserInputDto.fromEntity(createdUserInput); // Convert Entity to DTO for response
+            UserInputDto responseDTO = UserInputDto.fromEntity(createdUserInput);
             return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
         } catch (DataIntegrityViolationException ex) {
             throw new CustomException("Invalid user input data provided", HttpStatus.BAD_REQUEST);
@@ -66,10 +64,8 @@ public class UserInputController {
     public ResponseEntity<List<UserInputDto>> getAllUserInputs() {
         logger.info("UserInputController: getAllUserInputs - request for retrieving all user inputs recieved");
         List<UserInput> userInputs = userInputService.getAllUserInputs();
-        List<UserInputDto> userInputDTOs = userInputs.stream().map(UserInputDto::fromEntity).collect(Collectors.toList()); // Convert Entity list to DTO list
+        List<UserInputDto> userInputDTOs = userInputs.stream().map(UserInputDto::fromEntity).collect(Collectors.toList());
         return ResponseEntity.ok(userInputDTOs);
-//        List<UserInput> userInputs = userInputService.getAllUserInputs();
-//        return ResponseEntity.ok(userInputs);
     }
 
     @GetMapping("/{id}")
@@ -84,7 +80,7 @@ public class UserInputController {
 
         UserInput userInput = userInputService.getUserInputById(id).orElse(null);
         if (userInput != null) {
-            UserInputDto userInputDto = UserInputDto.fromEntity(userInput); // Convert Entity to DTO for response
+            UserInputDto userInputDto = UserInputDto.fromEntity(userInput);
             return ResponseEntity.ok(userInputDto);
         } else {
             throw new CustomException("User input not found", HttpStatus.NOT_FOUND);
