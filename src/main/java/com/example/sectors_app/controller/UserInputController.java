@@ -6,12 +6,14 @@ import com.example.sectors_app.service.UserInputService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.owasp.encoder.Encode;
 
 import java.util.List;
 
@@ -34,8 +36,10 @@ public class UserInputController {
             @ApiResponse(responseCode = "400", description = "Invalid user input data provided"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public ResponseEntity<UserInput> saveUserInput(@RequestBody UserInput userInput) {
+    public ResponseEntity<UserInput> saveUserInput(@Valid @RequestBody UserInput userInput) {
         logger.info("UserInputController: createUserInput - Request for creating user input received");
+
+        userInput.setName(Encode.forHtml(userInput.getName()));
 
         //TODO refactor exceptions to be more verbose about exact error
         try {

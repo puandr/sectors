@@ -3,6 +3,7 @@ package com.example.sectors_app.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
@@ -21,6 +22,7 @@ public class UserInput {
 
     @NotEmpty(message = "Name is mandatory")
     @Column(nullable = false)
+    @Size(max = 100, message = "Name cannot exceed 100 characters")
     private String name;
 
     @NotEmpty(message = "At least one sector should be selected")
