@@ -31,9 +31,7 @@ public class SectorController {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved list of sectors"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-//    public List<Sector> getAllSectors() {
-//        return sectorService.getAllSectors();
-//    }
+
     public List<SectorDto> getAllSectors() {
         return sectorService.getAllSectors().stream()
                 .map(this::convertToDto)

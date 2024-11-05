@@ -17,7 +17,6 @@ public class SectorService {
     }
 
     public List<Sector> getAllSectors() {
-//        return sectorRepository.findAll();
         return sectorRepository.findAllWithChildren();
     }
 
@@ -29,7 +28,7 @@ public class SectorService {
 
         Sector sector = sectorRepository.findById(id).orElse(null);
         if (sector != null) {
-            Hibernate.initialize(sector.getChildren()); // Force initialization
+            Hibernate.initialize(sector.getChildren());
         }
         return Optional.ofNullable(sector);
     }
