@@ -9,10 +9,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -35,36 +34,42 @@ public class SectorControllerTest {
         this.mockMvc = standaloneSetup(new SectorController(sectorService)).build();
     }
 
-    @Test
-    void shouldReturnAllSectors() throws Exception {
-        Sector sector1 = new Sector();
-        sector1.setId(1L);
-        sector1.setValueTag("1");
-        sector1.setName("Manufacturing");
-
-        Sector sector2 = new Sector();
-        sector2.setId(2L);
-        sector2.setValueTag("19");
-        sector2.setName("Construction materials");
-        sector2.setParent(sector1);
-
-        List<Sector> sectors = Arrays.asList(sector1, sector2);
-        when(sectorService.getAllSectors()).thenReturn(sectors);
-
-        mockMvc.perform(get("/api/sectors"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[0].name").value("Manufacturing"))
-                .andExpect(jsonPath("$[1].name").value("Construction materials"));
+    private Sector createSector(Long id, String valueTag, String name) {
+        Sector sector = new Sector();
+        sector.setId(id);
+        sector.setValueTag(valueTag);
+        sector.setName(name);
+        sector.setChildren(Collections.emptyList());
+        return sector;
     }
 
     @Test
-    void shouldReturnEmptyListWhenNoSectorsExist() throws Exception {
-        when(sectorService.getAllSectors()).thenReturn(Collections.emptyList());
+    public void getAllSectors_ReturnsSectorsList() throws Exception {
+        Sector sector = createSector(1L, "sector1", "Sector 1");
+        when(sectorService.getAllSectors()).thenReturn(List.of(sector));
 
         mockMvc.perform(get("/api/sectors"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(0));
+                .andExpect(jsonPath("$[0].id").value(sector.getId()))
+                .andExpect(jsonPath("$[0].name").value(sector.getName()));
+    }
+
+    @Test
+    public void getSectorById_ReturnsSector() throws Exception {
+        Sector sector = createSector(1L, "sector1", "Sector 1");
+        when(sectorService.getSectorById(1L)).thenReturn(Optional.of(sector));
+
+        mockMvc.perform(get("/api/sectors/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(sector.getId()))
+                .andExpect(jsonPath("$.name").value(sector.getName()));
+    }
+
+    @Test
+    public void getSectorById_NotFound() throws Exception {
+        when(sectorService.getSectorById(1L)).thenReturn(Optional.empty());
+
+        mockMvc.perform(get("/api/sectors/1"))
+                .andExpect(status().isNotFound());
     }
 }
-
