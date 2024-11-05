@@ -35,6 +35,9 @@ public class UserInput {
     @Column(nullable = false)
     private boolean agreeToTerms;
 
+    @Column(nullable = false, unique = true)
+    private String userId;
+
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
